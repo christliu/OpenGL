@@ -81,7 +81,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -122,21 +122,55 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Lib\glfw3.dll" />
+    <None Include="Shader\light.ps" />
+    <None Include="Shader\light.vs" />
+    <None Include="Shader\shader.ps" />
+    <None Include="Shader\shader.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Lib\glfw3.lib" />
     <Library Include="Lib\glfw3dll.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Camera.h" />
     <ClInclude Include="Include\GLFW\glfw3.h" />
     <ClInclude Include="Include\GLFW\glfw3native.h" />
+    <ClInclude Include="Include\glm\common.hpp" />
+    <ClInclude Include="Include\glm\exponential.hpp" />
+    <ClInclude Include="Include\glm\ext.hpp" />
+    <ClInclude Include="Include\glm\fwd.hpp" />
+    <ClInclude Include="Include\glm\geometric.hpp" />
+    <ClInclude Include="Include\glm\glm.hpp" />
+    <ClInclude Include="Include\glm\integer.hpp" />
+    <ClInclude Include="Include\glm\mat2x2.hpp" />
+    <ClInclude Include="Include\glm\mat2x3.hpp" />
+    <ClInclude Include="Include\glm\mat2x4.hpp" />
+    <ClInclude Include="Include\glm\mat3x2.hpp" />
+    <ClInclude Include="Include\glm\mat3x3.hpp" />
+    <ClInclude Include="Include\glm\mat3x4.hpp" />
+    <ClInclude Include="Include\glm\mat4x2.hpp" />
+    <ClInclude Include="Include\glm\mat4x3.hpp" />
+    <ClInclude Include="Include\glm\mat4x4.hpp" />
+    <ClInclude Include="Include\glm\matrix.hpp" />
+    <ClInclude Include="Include\glm\packing.hpp" />
+    <ClInclude Include="Include\glm\trigonometric.hpp" />
+    <ClInclude Include="Include\glm\vec2.hpp" />
+    <ClInclude Include="Include\glm\vec3.hpp" />
+    <ClInclude Include="Include\glm\vec4.hpp" />
+    <ClInclude Include="Include\glm\vector_relational.hpp" />
     <ClInclude Include="Include\GL\eglew.h" />
     <ClInclude Include="Include\GL\glew.h" />
     <ClInclude Include="Include\GL\glxew.h" />
     <ClInclude Include="Include\GL\wglew.h" />
+    <ClInclude Include="Include\Shader.h" />
+    <ClInclude Include="Include\SOIL.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Include\glm\CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
