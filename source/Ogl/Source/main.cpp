@@ -239,7 +239,7 @@ int main()
 
 		// Render
 		// Clear the colorbuffer
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		//glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Draw our first triangle
@@ -247,6 +247,7 @@ int main()
 		shader.Use();
 
 		delta = (GLfloat)glfwGetTime() - lastframe;
+		lastframe = (GLfloat)glfwGetTime();
 		
 		//glBindTexture(GL_TEXTURE_2D, texture1);
 		glActiveTexture(GL_TEXTURE0);
@@ -269,15 +270,20 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "perspective"), 1, GL_FALSE, glm::value_ptr(perspective));
 
-		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "objectColor"), objectcolor.x, objectcolor.y, objectcolor.z);
-		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightColor"), lightcolor.x, lightcolor.y, lightcolor.z);
-		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightPos"), lightpos.x, lightpos.y, lightpos.z);
+		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "objectColor"), objectcolor.x, objectcolor.y, objectcolor.z);
+		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightColor"), lightcolor.x, lightcolor.y, lightcolor.z);
+		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightPos"), lightpos.x, lightpos.y, lightpos.z);
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "viewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.ambient"), 1.0f, 0.5f, 1.31f);
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.diffuse"), 1.0f, 0.5f, 1.31f);
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(glGetUniformLocation(shader.m_shaderProgram, "material.shininess"), 32.0f);
+
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "light.ambient"), 0.2f, 0.2f, 0.2f);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "light.diffuse"), 0.5f, 0.5f, 0.5f);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "light.specular"), 1.0f, 1.0f, 1.0f);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "light.position"), lightpos.x, lightpos.y, lightpos.z);
 		glBindVertexArray(VAO);
 
 		glDrawArrays(GL_TRIANGLES,0, 36);
@@ -301,7 +307,7 @@ int main()
 		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
-		lastframe = (GLfloat)glfwGetTime();
+		
 	}
 	// Properly de-allocate all resources once they've outlived their purpose
 	glDeleteVertexArrays(1, &VAO);
