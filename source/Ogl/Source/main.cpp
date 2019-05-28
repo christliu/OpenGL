@@ -275,8 +275,8 @@ int main()
 		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightPos"), lightpos.x, lightpos.y, lightpos.z);
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "viewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 
-		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.ambient"), 1.0f, 0.5f, 1.31f);
-		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.diffuse"), 1.0f, 0.5f, 1.31f);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.ambient"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.diffuse"), 1.0f, 0.5f, 0.31f);
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(glGetUniformLocation(shader.m_shaderProgram, "material.shininess"), 32.0f);
 
