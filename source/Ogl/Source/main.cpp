@@ -229,7 +229,7 @@ int main()
 		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "objectColor"), objectcolor.x, objectcolor.y, objectcolor.z);
 		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightColor"), lightcolor.x, lightcolor.y, lightcolor.z);
 		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightPos"), lightpos.x, lightpos.y, lightpos.z);
-		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "viewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "viewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.ambient"), 1.0f, 0.5f, 0.31f);
 		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.diffuse"), 1.0f, 0.5f, 0.31f);
