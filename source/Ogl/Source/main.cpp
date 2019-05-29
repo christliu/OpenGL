@@ -77,13 +77,21 @@ int main()
 	Shader shader("Shader/shader.vs", "Shader/shader.ps");
 
 	Shader lightShader("Shader/light.vs", "Shader/light.ps");
-
 	GLuint texture1;
 	glGenTextures(1, &texture1);
 	glBindTexture(GL_TEXTURE_2D, texture1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(img);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	unsigned char* img2 = SOIL_load_image("res/container2_specular.png", &width, &height, 0, SOIL_LOAD_RGB);
+	GLuint texture2;
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img2);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(img2);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	float vertices[] = {
@@ -199,9 +207,12 @@ int main()
 		lastframe = (GLfloat)glfwGetTime();
 		
 		//glBindTexture(GL_TEXTURE_2D, texture1);
-		glUniform1i(glGetUniformLocation(shader.m_shaderProgram, "material.diffuse"), 0);
+		//glUniform1i(glGetUniformLocation(shader.m_shaderProgram, "material.diffuse"), 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
 
 		doMovement();
 		glm::mat4 model = glm::mat4(1.0f);
