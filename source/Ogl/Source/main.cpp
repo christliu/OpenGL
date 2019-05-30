@@ -144,6 +144,19 @@ int main()
 		1, 2, 3   // Second Triangle
 	};
 
+	glm::vec3 cubePositions[] = {
+	glm::vec3(0.0f,  0.0f,  0.0f),
+	glm::vec3(2.0f,  5.0f, -15.0f),
+	glm::vec3(-1.5f, -2.2f, -2.5f),
+	glm::vec3(-3.8f, -2.0f, -12.3f),
+	glm::vec3(2.4f, -0.4f, -3.5f),
+	glm::vec3(-1.7f,  3.0f, -7.5f),
+	glm::vec3(1.3f, -2.0f, -2.5f),
+	glm::vec3(1.5f,  2.0f, -2.5f),
+	glm::vec3(1.5f,  0.2f, -1.5f),
+	glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -222,31 +235,38 @@ int main()
 		glm::mat4 perspective = glm::mat4(1.0f);
 		perspective = glm::perspective(camera.Zoom, float(width) / height, 0.1f, 100.0f);
 		//std::cout << "hello " << std::endl;
-		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "perspective"), 1, GL_FALSE, glm::value_ptr(perspective));
 
-		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "objectColor"), objectcolor.x, objectcolor.y, objectcolor.z);
-		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightColor"), lightcolor.x, lightcolor.y, lightcolor.z);
-		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightPos"), lightpos.x, lightpos.y, lightpos.z);
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "viewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.ambient"), 1.0f, 0.5f, 0.31f);
-		//glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.diffuse"), 1.0f, 0.5f, 0.31f);
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "material.specular"), 0.5f, 0.5f, 0.5f);
 		glUniform1f(glGetUniformLocation(shader.m_shaderProgram, "material.shininess"), 32.0f);
 
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "light.ambient"), 0.2f, 0.2f, 0.2f);
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "light.diffuse"), 0.5f, 0.5f, 0.5f);
 		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "light.specular"), 1.0f, 1.0f, 1.0f);
-		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "light.position"), lightpos.x, lightpos.y, lightpos.z);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "light.direction"), -0.2f, -1.0f, -0.3f);
 		glBindVertexArray(VAO);
 
-		glDrawArrays(GL_TRIANGLES,0, 36);
+		for(GLuint i = 0; i < 10; i++)
+		{
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			GLfloat angle = 20.0f * i;
+			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3, 0.5f));
+			glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		}
+
 		glBindVertexArray(0);
 		//glBindTexture(GL_TEXTURE_2D, 0);
 		// Swap the screen buffers
 
+		/*
 		lightShader.Use();
 		model = glm::mat4(1.0);
 
@@ -261,7 +281,7 @@ int main()
 		glBindVertexArray(LightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
-
+		*/
 		glfwSwapBuffers(window);
 		
 	}
