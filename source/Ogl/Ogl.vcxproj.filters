@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\main.cpp">
+    <ClCompile Include="Source\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Shader.cpp">
+    <ClCompile Include="Source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -28,6 +28,8 @@
     <None Include="Shader\light.vs" />
     <None Include="Shader\shader.ps" />
     <None Include="Shader\shader.vs" />
+    <None Include="Shader\model.ps" />
+    <None Include="Shader\model.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Lib\glfw3.lib" />
@@ -128,6 +130,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\glm\vector_relational.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
