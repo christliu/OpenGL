@@ -230,7 +230,7 @@ int main()
 		glm::mat4 view = camera.GetViewMatrix();
 
 		glm::mat4 perspective = glm::mat4(1.0f);
-		perspective = glm::perspective(glm::radians(camera.Zoom), float(width) / float(height), 0.1f, 100.0f);
+		perspective = glm::perspective(glm::radians(camera.Zoom), float(WIDTH) / float(HEIGHT), 0.1f, 100.0f);
 
 		/*
 		shader.Use();
