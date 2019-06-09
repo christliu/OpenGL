@@ -172,6 +172,7 @@
     <ClInclude Include="Include\Model.h" />
     <ClInclude Include="Include\Shader.h" />
     <ClInclude Include="Include\SOIL.h" />
+    <ClInclude Include="Include\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Include\glm\CMakeLists.txt" />

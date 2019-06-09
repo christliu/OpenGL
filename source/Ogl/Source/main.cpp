@@ -14,6 +14,7 @@
 #include"Shader.h"
 #include"Camera.h"
 #include "Model.h"
+#include "Texture.h"
 
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -77,26 +78,11 @@ int main()
 	Model ourModel("res/nanosuit/nanosuit.obj");
 	Shader modelShader("Shader/model.vs", "Shader/model.ps");
 	
-	unsigned char* img = SOIL_load_image("res/container2.png", &width, &height, 0, SOIL_LOAD_RGB);
 	Shader shader("Shader/shader.vs", "Shader/shader.ps");
-
 	Shader lightShader("Shader/light.vs", "Shader/light.ps");
-	GLuint texture1;
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	SOIL_free_image_data(img);
-	glBindTexture(GL_TEXTURE_2D, 0);
 
-	unsigned char* img2 = SOIL_load_image("res/container2_specular.png", &width, &height, 0, SOIL_LOAD_RGB);
-	GLuint texture2;
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img2);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	SOIL_free_image_data(img2);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	OpenGLTexture texture1(GL_TEXTURE_2D, "res/container2.png");
+	OpenGLTexture texture2(GL_TEXTURE_2D, "res/container2_specular.png");
 
 	float vertices[] = {
 		// positions          // normals           // texture coords
@@ -209,8 +195,6 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
-	ourModel.Show();
-
 	GLfloat start = (GLfloat)glfwGetTime();
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -232,13 +216,12 @@ int main()
 		glm::mat4 perspective = glm::mat4(1.0f);
 		perspective = glm::perspective(glm::radians(camera.Zoom), float(WIDTH) / float(HEIGHT), 0.1f, 100.0f);
 
-		/*
 		shader.Use();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
+		glUniform1i(glGetUniformLocation(shader.m_shaderProgram, "material.diffuse"), 0);
+		glUniform1i(glGetUniformLocation(shader.m_shaderProgram, "material.specular"), 1);
+		texture1.Bind(GL_TEXTURE0);
+		texture2.Bind(GL_TEXTURE1);
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
 		
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "perspective"), 1, GL_FALSE, glm::value_ptr(perspective));
@@ -322,7 +305,7 @@ int main()
 		}
 
 		glBindVertexArray(0);
-		*/
+		/*
 		modelShader.Use();
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
@@ -332,7 +315,7 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(modelShader.m_shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(perspective));
 
 		ourModel.Draw(modelShader);
-		
+		*/
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 

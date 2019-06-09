@@ -1,0 +1,291 @@
+[1mdiff --git a/source/Ogl/Ogl.vcxproj b/source/Ogl/Ogl.vcxproj[m
+[1mindex 9b096f1..ad5453e 100644[m
+[1m--- a/source/Ogl/Ogl.vcxproj[m
+[1m+++ b/source/Ogl/Ogl.vcxproj[m
+[36m@@ -172,6 +172,7 @@[m
+     <ClInclude Include="Include\Model.h" />[m
+     <ClInclude Include="Include\Shader.h" />[m
+     <ClInclude Include="Include\SOIL.h" />[m
+[32m+[m[32m    <ClInclude Include="Include\Texture.h" />[m
+   </ItemGroup>[m
+   <ItemGroup>[m
+     <Text Include="Include\glm\CMakeLists.txt" />[m
+[1mdiff --git a/source/Ogl/Ogl.vcxproj.filters b/source/Ogl/Ogl.vcxproj.filters[m
+[1mindex d5b0a3d..b05b1de 100644[m
+[1m--- a/source/Ogl/Ogl.vcxproj.filters[m
+[1m+++ b/source/Ogl/Ogl.vcxproj.filters[m
+[36m@@ -138,6 +138,9 @@[m
+     <ClInclude Include="Include\Model.h">[m
+       <Filter>Header Files</Filter>[m
+     </ClInclude>[m
+[32m+[m[32m    <ClInclude Include="Include\Texture.h">[m
+[32m+[m[32m      <Filter>Header Files</Filter>[m
+[32m+[m[32m    </ClInclude>[m
+   </ItemGroup>[m
+   <ItemGroup>[m
+     <Text Include="Include\glm\CMakeLists.txt" />[m
+[1mdiff --git a/source/Ogl/Source/main.cpp b/source/Ogl/Source/main.cpp[m
+[1mindex acdd19a..eb8f5de 100644[m
+[1m--- a/source/Ogl/Source/main.cpp[m
+[1m+++ b/source/Ogl/Source/main.cpp[m
+[36m@@ -14,6 +14,7 @@[m
+ #include"Shader.h"[m
+ #include"Camera.h"[m
+ #include "Model.h"[m
+[32m+[m[32m#include "Texture.h"[m
+ [m
+ // Function prototypes[m
+ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);[m
+[36m@@ -77,26 +78,11 @@[m [mint main()[m
+ 	Model ourModel("res/nanosuit/nanosuit.obj");[m
+ 	Shader modelShader("Shader/model.vs", "Shader/model.ps");[m
+ 	[m
+[31m-	unsigned char* img = SOIL_load_image("res/container2.png", &width, &height, 0, SOIL_LOAD_RGB);[m
+ 	Shader shader("Shader/shader.vs", "Shader/shader.ps");[m
+[31m-[m
+ 	Shader lightShader("Shader/light.vs", "Shader/light.ps");[m
+[31m-	GLuint texture1;[m
+[31m-	glGenTextures(1, &texture1);[m
+[31m-	glBindTexture(GL_TEXTURE_2D, texture1);[m
+[31m-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);[m
+[31m-	glGenerateMipmap(GL_TEXTURE_2D);[m
+[31m-	SOIL_free_image_data(img);[m
+[31m-	glBindTexture(GL_TEXTURE_2D, 0);[m
+[31m-[m
+[31m-	unsigned char* img2 = SOIL_load_image("res/container2_specular.png", &width, &height, 0, SOIL_LOAD_RGB);[m
+[31m-	GLuint texture2;[m
+[31m-	glGenTextures(1, &texture2);[m
+[31m-	glBindTexture(GL_TEXTURE_2D, texture2);[m
+[31m-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img2);[m
+[31m-	glGenerateMipmap(GL_TEXTURE_2D);[m
+[31m-	SOIL_free_image_data(img2);[m
+[31m-	glBindTexture(GL_TEXTURE_2D, 0);[m
+[32m+[m
+[32m+[m	[32mOpenGLTexture texture1(GL_TEXTURE_2D, "res/container2.png");[m
+[32m+[m	[32mOpenGLTexture texture2(GL_TEXTURE_2D, "res/container2_specular.png");[m
+ [m
+ 	float vertices[] = {[m
+ 		// positions          // normals           // texture coords[m
+[36m@@ -209,8 +195,6 @@[m [mint main()[m
+ [m
+ 	glEnable(GL_DEPTH_TEST);[m
+ [m
+[31m-	ourModel.Show();[m
+[31m-[m
+ 	GLfloat start = (GLfloat)glfwGetTime();[m
+ 	// Game loop[m
+ 	while (!glfwWindowShouldClose(window))[m
+[36m@@ -232,13 +216,12 @@[m [mint main()[m
+ 		glm::mat4 perspective = glm::mat4(1.0f);[m
+ 		perspective = glm::perspective(glm::radians(camera.Zoom), float(WIDTH) / float(HEIGHT), 0.1f, 100.0f);[m
+ [m
+[31m-		/*[m
+ 		shader.Use();[m
+[31m-		glActiveTexture(GL_TEXTURE0);[m
+[31m-		glBindTexture(GL_TEXTURE_2D, texture1);[m
+[32m+[m		[32mglUniform1i(glGetUniformLocation(shader.m_shaderProgram, "material.diffuse"), 0);[m
+[32m+[m		[32mglUniform1i(glGetUniformLocation(shader.m_shaderProgram, "material.specular"), 1);[m
+[32m+[m		[32mtexture1.Bind(GL_TEXTURE0);[m
+[32m+[m		[32mtexture2.Bind(GL_TEXTURE1);[m
+ [m
+[31m-		glActiveTexture(GL_TEXTURE1);[m
+[31m-		glBindTexture(GL_TEXTURE_2D, texture2);[m
+ 		[m
+ 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));[m
+ 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "perspective"), 1, GL_FALSE, glm::value_ptr(perspective));[m
+[36m@@ -322,7 +305,7 @@[m [mint main()[m
+ 		}[m
+ [m
+ 		glBindVertexArray(0);[m
+[31m-		*/[m
+[32m+[m		[32m/*[m
+ 		modelShader.Use();[m
+ 		model = glm::mat4(1.0f);[m
+ 		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene[m
+[36m@@ -332,7 +315,7 @@[m [mint main()[m
+ 		glUniformMatrix4fv(glGetUniformLocation(modelShader.m_shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(perspective));[m
+ [m
+ 		ourModel.Draw(modelShader);[m
+[31m-		[m
+[32m+[m		[32m*/[m
+ 		glfwSwapBuffers(window);[m
+ 		glfwPollEvents();[m
+ [m
+[1mdiff --git a/source/Ogl/Source/modelshow.cpp b/source/Ogl/Source/modelshow.cpp[m
+[1mdeleted file mode 100644[m
+[1mindex d3d4e1a..0000000[m
+[1m--- a/source/Ogl/Source/modelshow.cpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,171 +0,0 @@[m
+[31m-// Std. Includes[m
+[31m-#include <string>[m
+[31m-[m
+[31m-// GLEW[m
+[31m-#define GLEW_STATIC[m
+[31m-#include <GL/glew.h>[m
+[31m-[m
+[31m-// GLFW[m
+[31m-#include <GLFW/glfw3.h>[m
+[31m-[m
+[31m-// GL includes[m
+[31m-#include "Shader.h"[m
+[31m-#include "Camera.h"[m
+[31m-#include "Model.h"[m
+[31m-[m
+[31m-// GLM Mathemtics[m
+[31m-#include <glm/glm.hpp>[m
+[31m-#include <glm/gtc/matrix_transform.hpp>[m
+[31m-#include <glm/gtc/type_ptr.hpp>[m
+[31m-[m
+[31m-// Other Libs[m
+[31m-#include <SOIL.h>[m
+[31m-[m
+[31m-// Properties[m
+[31m-GLuint screenWidth = 800, screenHeight = 600;[m
+[31m-[m
+[31m-// Function prototypes[m
+[31m-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);[m
+[31m-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);[m
+[31m-void mouse_callback(GLFWwindow* window, double xpos, double ypos);[m
+[31m-void Do_Movement();[m
+[31m-[m
+[31m-// Camera[m
+[31m-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));[m
+[31m-bool keys[1024];[m
+[31m-GLfloat lastX = 400, lastY = 300;[m
+[31m-bool firstMouse = true;[m
+[31m-[m
+[31m-GLfloat deltaTime = 0.0f;[m
+[31m-GLfloat lastFrame = 0.0f;[m
+[31m-[m
+[31m-// The MAIN function, from here we start our application and run our Game loop[m
+[31m-int main()[m
+[31m-{[m
+[31m-	// Init GLFW[m
+[31m-	glfwInit();[m
+[31m-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);[m
+[31m-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);[m
+[31m-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);[m
+[31m-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);[m
+[31m-[m
+[31m-	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "LearnOpenGL", nullptr, nullptr); // Windowed[m
+[31m-	glfwMakeContextCurrent(window);[m
+[31m-[m
+[31m-	// Set the required callback functions[m
+[31m-	glfwSetKeyCallback(window, key_callback);[m
+[31m-	glfwSetCursorPosCallback(window, mouse_callback);[m
+[31m-	glfwSetScrollCallback(window, scroll_callback);[m
+[31m-[m
+[31m-	// Options[m
+[31m-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);[m
+[31m-[m
+[31m-	// Initialize GLEW to setup the OpenGL Function pointers[m
+[31m-	glewExperimental = GL_TRUE;[m
+[31m-	glewInit();[m
+[31m-[m
+[31m-	// Define the viewport dimensions[m
+[31m-	glViewport(0, 0, screenWidth, screenHeight);[m
+[31m-[m
+[31m-	// Setup some OpenGL options[m
+[31m-	glEnable(GL_DEPTH_TEST);[m
+[31m-[m
+[31m-	// Setup and compile our shaders[m
+[31m-	Shader shader("Shader/model.vs", "Shader/model.ps");[m
+[31m-[m
+[31m-	// Load models[m
+[31m-	Model ourModel("res/nanosuit/nanosuit.obj");[m
+[31m-[m
+[31m-	// Draw in wireframe[m
+[31m-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);[m
+[31m-[m
+[31m-	// Game loop[m
+[31m-	while (!glfwWindowShouldClose(window))[m
+[31m-	{[m
+[31m-		// Set frame time[m
+[31m-		GLfloat currentFrame = glfwGetTime();[m
+[31m-		deltaTime = currentFrame - lastFrame;[m
+[31m-		lastFrame = currentFrame;[m
+[31m-[m
+[31m-		// Check and call events[m
+[31m-		glfwPollEvents();[m
+[31m-		Do_Movement();[m
+[31m-[m
+[31m-		// Clear the colorbuffer[m
+[31m-		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);[m
+[31m-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);[m
+[31m-[m
+[31m-		shader.Use();   // <-- Don't forget this one![m
+[31m-		// Transformation matrices[m
+[31m-		glm::mat4 projection = glm::perspective(camera.Zoom, (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);[m
+[31m-		glm::mat4 view = camera.GetViewMatrix();[m
+[31m-		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));[m
+[31m-		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));[m
+[31m-[m
+[31m-		// Draw the loaded model[m
+[31m-		glm::mat4 model;[m
+[31m-		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // Translate it down a bit so it's at the center of the scene[m
+[31m-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// It's a bit too big for our scene, so scale it down[m
+[31m-		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));[m
+[31m-		ourModel.Draw(shader);[m
+[31m-[m
+[31m-		// Swap the buffers[m
+[31m-		glfwSwapBuffers(window);[m
+[31m-	}[m
+[31m-[m
+[31m-	glfwTerminate();[m
+[31m-	return 0;[m
+[31m-}[m
+[31m-[m
+[31m-#pragma region "User input"[m
+[31m-[m
+[31m-// Moves/alters the camera positions based on user input[m
+[31m-void Do_Movement()[m
+[31m-{[m
+[31m-	// Camera controls[m
+[31m-	if (keys[GLFW_KEY_W])[m
+[31m-		camera.ProcessKeyboard(FORWARD, deltaTime);[m
+[31m-	if (keys[GLFW_KEY_S])[m
+[31m-		camera.ProcessKeyboard(BACKWARD, deltaTime);[m
+[31m-	if (keys[GLFW_KEY_A])[m
+[31m-		camera.ProcessKeyboard(LEFT, deltaTime);[m
+[31m-	if (keys[GLFW_KEY_D])[m
+[31m-		camera.ProcessKeyboard(RIGHT, deltaTime);[m
+[31m-}[m
+[31m-[m
+[31m-// Is called whenever a key is pressed/released via GLFW[m
+[31m-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)[m
+[31m-{[m
+[31m-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)[m
+[31m-		glfwSetWindowShouldClose(window, GL_TRUE);[m
+[31m-[m
+[31m-	if (action == GLFW_PRESS)[m
+[31m-		keys[key] = true;[m
+[31m-	else if (action == GLFW_RELEASE)[m
+[31m-		keys[key] = false;[m
+[31m-}[m
+[31m-[m
+[31m-void mouse_callback(GLFWwindow* window, double xpos, double ypos)[m
+[31m-{[m
+[31m-	if (firstMouse)[m
+[31m-	{[m
+[31m-		lastX = xpos;[m
+[31m-		lastY = ypos;[m
+[31m-		firstMouse = false;[m
+[31m-	}[m
+[31m-[m
+[31m-	GLfloat xoffset = xpos - lastX;[m
+[31m-	GLfloat yoffset = lastY - ypos;[m
+[31m-[m
+[31m-	lastX = xpos;[m
+[31m-	lastY = ypos;[m
+[31m-[m
+[31m-	camera.ProcessMouseMovement(xoffset, yoffset);[m
+[31m-}[m
+[31m-[m
+[31m-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)[m
+[31m-{[m
+[31m-	camera.ProcessMouseScroll(yoffset);[m
+[31m-}[m
+[31m-[m
+[31m-#pragma endregion[m
+\ No newline at end of file[m
