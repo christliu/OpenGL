@@ -2,7 +2,8 @@
 https://learnopengl-cn.readthedocs.io/zh/latest/
 
 # 运行环境
-cmake 3.8以上的版本。
+win10 + vs2017以上 + cmake 3.8以上
+目录不支持mac和linux系统。
 # 建立工程
 新建目录build
 
