@@ -11,6 +11,7 @@ set(Projects
 	1.EmptyWindow
 	2.MultiLighting
 	3.ModelLoading
+	4.DepthTest
 )
 
 foreach(Proj ${Projects})
