@@ -12,6 +12,9 @@ set(Projects
 	2.MultiLighting
 	3.ModelLoading
 	4.DepthTest
+	5.StencilTest
+	6.FrameBuffer
+	7.CubeMap
 )
 
 foreach(Proj ${Projects})
