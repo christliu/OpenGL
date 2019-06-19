@@ -78,6 +78,7 @@ int main()
 	Shader skyshader("shader/7.Skybox.vs", "shader/7.Skybox.ps");
 	Shader boxshader("shader/7.Cubemap.vs", "shader/7.Cubemap.ps");
 	Shader reflectshader("shader/7.Reflect.vs", "shader/7.Reflect.ps");
+	Shader refractshader("shader/7.Reflect.vs", "shader/7.Refract.ps");
 
 	float skyboxVertices[] = {
 	    // positions          
@@ -315,7 +316,19 @@ int main()
 		glUniform3f(glGetUniformLocation(reflectshader.m_shaderProgram, "cameraPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);  		
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);		
+
+        refractshader.Use();
+		model = glm::translate(model, glm::vec3(8.0f, 0.0f, -1.0f));
+        glUniformMatrix4fv(glGetUniformLocation(reflectshader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(reflectshader.m_shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(perspective));
+		glUniformMatrix4fv(glGetUniformLocation(reflectshader.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3f(glGetUniformLocation(reflectshader.m_shaderProgram, "cameraPos"), camera.Position.x, camera.Position.y, camera.Position.z);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);  
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glBindVertexArray(0);	
+
+
 
 		view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
 		glDepthFunc(GL_LEQUAL);
