@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 3.8)
 cmake_policy(VERSION 3.8)
 
 Project(OpenGL)
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 add_library(Shader src/Shader.cpp)

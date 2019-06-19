@@ -76,6 +76,7 @@ int main()
 	glViewport(0, 0, width, height);
 
 	Shader skyshader("shader/7.Skybox.vs", "shader/7.Skybox.ps");
+	Shader boxshader("shader/7.Cubemap.vs", "shader/7.Cubemap.ps");
 
 	float skyboxVertices[] = {
 	    // positions          
@@ -122,6 +123,51 @@ int main()
 	     1.0f, -1.0f,  1.0f
 	};
 
+	 float cubeVertices[] = {
+        // positions          // texture Coords
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -145,6 +191,24 @@ int main()
 	faces.push_back("res/textures/skybox/back.jpg");
 	GLuint cubemapTexture = loadCubemap(faces);
 
+	GLuint CubeVBO, CubeVAO;
+	glGenVertexArrays(1, &CubeVAO);
+	glGenBuffers(1, &CubeVBO);
+	glBindVertexArray(CubeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, CubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindVertexArray(0); 
+
+	OpenGLTexture boxtexture(GL_TEXTURE_2D, "res/textures/marble.jpg");
+
 	GLfloat start = (GLfloat)glfwGetTime();
 
 	glEnable(GL_DEPTH_TEST);
@@ -164,16 +228,24 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glDepthMask(GL_FALSE);
-
 		glm::mat4 model = glm::mat4(1.0f);
-
-		glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
-		//glm::mat4 view = camera.GetViewMatrix();
-
+		model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 perspective = glm::mat4(1.0f);
 		perspective = glm::perspective(glm::radians(camera.Zoom), float(WIDTH) / float(HEIGHT), 0.1f, 100.0f);
 
+		glBindVertexArray(CubeVAO);
+
+		boxshader.Use();
+		glUniformMatrix4fv(glGetUniformLocation(boxshader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(boxshader.m_shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(perspective));
+		glUniformMatrix4fv(glGetUniformLocation(boxshader.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		boxtexture.Bind(GL_TEXTURE0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+
+		view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+		glDepthFunc(GL_LEQUAL);
 		skyshader.Use();
 		glBindVertexArray(VAO);
 		glUniformMatrix4fv(glGetUniformLocation(skyshader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -183,7 +255,7 @@ int main()
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
-		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
