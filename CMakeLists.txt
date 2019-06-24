@@ -16,6 +16,7 @@ set(Projects
 	5.StencilTest
 	6.FrameBuffer
 	7.CubeMap
+	8.UniformBuffer
 )
 
 foreach(Proj ${Projects})
