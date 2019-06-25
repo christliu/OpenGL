@@ -5,20 +5,21 @@
 #include "Shader.h"
 
 
-Shader::Shader(const GLchar* vs, const GLchar* ps)
+Shader::Shader(const GLchar* vs, const GLchar* ps, const GLchar* gs)
 {
-	std::string vscode, pscode;
+	std::string vscode, pscode, gscode;
 
-	std::ifstream vShaderFile, pShaderFile;
+	std::ifstream vShaderFile, pShaderFile, gShaderFile;
 	vShaderFile.exceptions(std::ifstream::badbit);
 	pShaderFile.exceptions(std::ifstream::badbit);
+	gShaderFile.exceptions(std::ifstream::badbit);
 
 	try
 	{
 		vShaderFile.open(vs);
 		pShaderFile.open(ps);
 
-		std::stringstream vss, pss;
+		std::stringstream vss, pss, gss;
 		vss << vShaderFile.rdbuf();
 		pss << pShaderFile.rdbuf();
 
@@ -27,6 +28,14 @@ Shader::Shader(const GLchar* vs, const GLchar* ps)
 
 		vscode = vss.str();
 		pscode = pss.str();
+
+		if(gs)
+		{
+			gShaderFile.open(gs);
+			gss << gShaderFile.rdbuf();
+			gShaderFile.close();
+			gscode = gss.str();
+		}
 	}
 	catch(std::ifstream::failure e)
 	{
@@ -36,6 +45,7 @@ Shader::Shader(const GLchar* vs, const GLchar* ps)
 	const GLchar* pShaderCode = pscode.c_str();
 
 	GLuint vertexShader, fragmentShader;
+	GLuint geometryShader;
 
 	GLint success;
 	GLchar infoLog[512];
@@ -61,9 +71,28 @@ Shader::Shader(const GLchar* vs, const GLchar* ps)
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 	};
 
+	if(gs)
+	{
+		const GLchar* gShaderCode = gscode.c_str();
+		//GLuint geometryShader;
+		geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+		glShaderSource(geometryShader, 1, &gShaderCode, NULL);
+		glCompileShader(geometryShader);
+		glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
+		if(!success)
+		{
+			glGetShaderInfoLog(geometryShader, 512, NULL, infoLog);
+			std::cout << "ERROR: Compile Geometry Shader\n" << infoLog << std::endl;
+		}
+	}
+
 	m_shaderProgram = glCreateProgram();
 	glAttachShader(m_shaderProgram, vertexShader);
 	glAttachShader(m_shaderProgram, fragmentShader);
+	if(gs != NULL)
+	{
+		glAttachShader(m_shaderProgram, geometryShader);
+	}
 	glLinkProgram(m_shaderProgram);
 	// Check for linking errors
 	glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &success);
@@ -73,6 +102,10 @@ Shader::Shader(const GLchar* vs, const GLchar* ps)
 	}
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+	if(gs!=NULL)
+	{
+		glDeleteShader(geometryShader);
+	}
 	std::cout << "build shader success" << std::endl;
 }
 

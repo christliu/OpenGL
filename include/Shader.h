@@ -4,7 +4,7 @@
 class Shader
 {
 public:
-	Shader(const GLchar* vspath, const GLchar* pspath);
+	Shader(const GLchar* vspath, const GLchar* pspath, const GLchar* gs=NULL);
 
 	void Use();
 
