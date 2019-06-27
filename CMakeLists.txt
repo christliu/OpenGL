@@ -18,6 +18,8 @@ set(Projects
 	7.CubeMap
 	8.UniformBuffer
 	9.1.GeometryShader
+	9.2.ExplodeShader
+	9.3.NormalShow
 )
 
 foreach(Proj ${Projects})
