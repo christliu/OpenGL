@@ -20,6 +20,7 @@ set(Projects
 	9.1.GeometryShader
 	9.2.ExplodeShader
 	9.3.NormalShow
+	10.1.Instancing
 )
 
 foreach(Proj ${Projects})
