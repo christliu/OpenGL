@@ -21,6 +21,7 @@ set(Projects
 	9.2.ExplodeShader
 	9.3.NormalShow
 	10.1.Instancing
+	10.2.Instancing-planet
 )
 
 foreach(Proj ${Projects})

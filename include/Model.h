@@ -37,9 +37,9 @@ public:
 			it->Draw(shader);
 		}
 	}
+	std::vector<Mesh> meshes;
 
 private:
-	std::vector<Mesh> meshes;
 	std::string directory;
 	std::vector<Texture> textures_loaded;
 
