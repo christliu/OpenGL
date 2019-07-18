@@ -44,6 +44,11 @@ private:
 		glBindTexture(m_target, m_textureID);
 		glTexImage2D(m_target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
 		glGenerateMipmap(m_target);  // 自动生成LOD纹理
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+   	 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    	// set texture filtering parameters
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		SOIL_free_image_data(img);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

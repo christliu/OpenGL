@@ -23,7 +23,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 const GLuint WIDTH = 800;
 const GLuint HEIGHT = 600;
 
-glm::vec3 cameraPos = glm::vec3(0, 0, 3);
+glm::vec3 cameraPos = glm::vec3(0, 0, 10);
 
 glm::vec3 lightpos = glm::vec3(1.2f, 1.0f, 2.0f);
 glm::vec3 lightcolor = glm::vec3(1, 1, 1);
