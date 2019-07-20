@@ -23,6 +23,7 @@ set(Projects
 	10.1.Instancing
 	10.2.Instancing-planet
 	11.1.ShadowMap
+	11.2.ShadowMapScene
 )
 
 foreach(Proj ${Projects})

@@ -14,7 +14,9 @@ enum Camera_Movement {
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	UP,
+	DOWN
 };
 
 class Camera
@@ -63,6 +65,10 @@ public:
 			this->Position -= this->Right * velocity;
 		if (direction == RIGHT)
 			this->Position += this->Right * velocity;
+		if (direction == UP)
+			this->Position += WorldUp * velocity;
+		if(direction == DOWN)
+			this->Position -= WorldUp * velocity;
 	}
 
 	// Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
