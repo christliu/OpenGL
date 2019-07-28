@@ -24,7 +24,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 const GLuint WIDTH = 1280;
 const GLuint HEIGHT = 720;
 
-glm::vec3 cameraPos = glm::vec3(0, 0, 4);
+glm::vec3 cameraPos = glm::vec3(0, 0, 3);
 
 glm::vec3 lightPos(-2.0f, 4.0f, -1.0f);
 
@@ -57,7 +57,7 @@ int main()
 
 
 	// Create a GLFWwindow object that we can use for GLFW's functions
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "OpenGL", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -237,7 +237,7 @@ int main()
 
 		glm::mat4 lightProjection, lightView;
         glm::mat4 lightSpaceMatrix;
-        float near_plane = 1.0f, far_plane = 7.5f;
+        float near_plane = 1.0f, far_plane = 17.5f;
         lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         //lightProjection = glm::perspective(glm::radians(90.0f), float(WIDTH) / float(HEIGHT), 0.1f, 10.0f);
         lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
@@ -255,11 +255,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		sceneShader.Use();
-		//wood.Bind(GL_TEXTURE0);
 		glUniformMatrix4fv(glGetUniformLocation(sceneShader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(sceneShader.m_shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(sceneShader.m_shaderProgram, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-		// glUniformMatrix3fv(glGetUniformLocation(sceneShader.m_shaderProgram, "lightPos"), 1, GL_FALSE, glm::value_ptr(lightPos));
 		glUniform3f(glGetUniformLocation(sceneShader.m_shaderProgram, "viewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		glUniform3f(glGetUniformLocation(sceneShader.m_shaderProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
@@ -274,13 +272,13 @@ int main()
 
 		RenderScene(sceneShader);
 
-		// quadShader.Use();
-		// glActiveTexture(GL_TEXTURE0);
-  //       glBindTexture(GL_TEXTURE_2D, depthMap);
-  //       glBindVertexArray(QuadVAO);
-  //       glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  //       glBindVertexArray(0);
-  //       glBindTexture(GL_TEXTURE_2D, 0);
+		 //quadShader.Use();
+		 //glActiveTexture(GL_TEXTURE0);
+   //      glBindTexture(GL_TEXTURE_2D, depthMap);
+   //      glBindVertexArray(QuadVAO);
+   //      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+   //      glBindVertexArray(0);
+   //      glBindTexture(GL_TEXTURE_2D, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
