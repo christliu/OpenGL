@@ -261,6 +261,10 @@ int main()
 
 		glm::mat4 view = camera.GetViewMatrix();
 
+		glm::mat4 reflectMatrix = glm::mat4(1.0f);
+		reflectMatrix = glm::scale(reflectMatrix, glm::vec3(1, 1, -1));
+		view = view * reflectMatrix;
+
 		glm::mat4 perspective = glm::mat4(1.0f);
 		perspective = glm::perspective(glm::radians(camera.Zoom), float(WIDTH) / float(HEIGHT), 0.1f, 100.0f);
 
@@ -275,16 +279,13 @@ int main()
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		view = camera.GetViewMatrix();
 
+		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		RenderScene(shader);
 	
 		glBindVertexArray(mirroVAO);
 		mirrorShader.Use();
-
-		glm::mat4 reflectMatrix = glm::mat4(1.0f);
-		reflectMatrix = glm::scale(reflectMatrix, glm::vec3(1, 1, -1));
-		view = view * reflectMatrix;
-
 		glUniformMatrix4fv(glGetUniformLocation(mirrorShader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(mirrorShader.m_shaderProgram, "perspective"), 1, GL_FALSE, glm::value_ptr(perspective));
 		
@@ -313,7 +314,7 @@ void RenderScene(Shader &shader)
 	boxTexture->Bind(GL_TEXTURE0);
 	glm::mat4 model = glm::mat4(1.0f);
 	glBindVertexArray(VAO);
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f));
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 5.0f));
 	model = glm::scale(model, glm::vec3(0.2, 0.2, 0.2));
 	glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glDrawArrays(GL_TRIANGLES, 0, 36);
