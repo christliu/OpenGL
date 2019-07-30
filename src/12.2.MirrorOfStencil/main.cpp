@@ -47,7 +47,7 @@ void doMovement();
 
 OpenGLTexture *boxTexture, *floorTexture;
 
-void RenderScene(Shader &shader);
+void RenderScene(Shader &shader, bool);
 
 // The MAIN function, from here we start the application and run the game loop
 int main()
@@ -83,7 +83,9 @@ int main()
 
 	Shader shader("shader/4.DepthTest.vs", "shader/4.DepthTest.ps");
 
-	Shader mirrorShader("shader/4.DepthTest.vs", "shader/4.DepthTest.ps");
+	Shader shaderInMirror("shader/4.DepthTest.vs", "shader/12.2.mirrorScene.ps");
+
+	Shader mirrorShader("shader/4.DepthTest.vs", "shader/8.red.ps");
 
 	//OpenGLTexture boxTexture(GL_TEXTURE_2D, "res/textures/marble.jpg");
 	//OpenGLTexture floorTexture(GL_TEXTURE_2D, "res/textures/metal.png");
@@ -235,8 +237,13 @@ int main()
 		std::cout << " ERROR: FRAMEBUFFER::Framebuffers is not completed!" <<std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	GLfloat start = (GLfloat)glfwGetTime();
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST); 
+
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
 	// Game loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -249,50 +256,64 @@ int main()
 
 		doMovement();
 
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glEnable(GL_DEPTH_TEST);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 
 		glm::mat4 model = glm::mat4(1.0f);
 
 		glm::mat4 view = camera.GetViewMatrix();
 
-		glm::mat4 reflectMatrix = glm::mat4(1.0f);
-		reflectMatrix = glm::scale(reflectMatrix, glm::vec3(1, 1, -1)); //  ��xyƽ����Ϊ���ӣ��൱��z���Ϊ-1���������䡣
-		view = view * reflectMatrix;
-
 		glm::mat4 perspective = glm::mat4(1.0f);
 		perspective = glm::perspective(glm::radians(camera.Zoom), float(WIDTH) / float(HEIGHT), 0.1f, 100.0f);
 
-		shader.Use();
+		// Render Normal Scene
+		glDisable(GL_STENCIL_TEST);
+		glStencilMask(0x00);
 
+		shader.Use();
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "perspective"), 1, GL_FALSE, glm::value_ptr(perspective));
-		RenderScene(shader);
+		RenderScene(shader, true);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		view = camera.GetViewMatrix();
+		// Draw Mirror
+		glEnable(GL_STENCIL_TEST);
+		glClear(GL_STENCIL_BUFFER_BIT);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xff);
 
-		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		RenderScene(shader);
-	
-		glBindVertexArray(mirroVAO);
+		glDepthMask(GL_FALSE);
+
 		mirrorShader.Use();
+		glBindVertexArray(mirroVAO);
+		model = glm::mat4(1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(mirrorShader.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(mirrorShader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(mirrorShader.m_shaderProgram, "perspective"), 1, GL_FALSE, glm::value_ptr(perspective));
-		
-		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-		model = glm::translate(model, glm::vec3(1.0f, 1.0f, 0.0f));
-
-		glUniformMatrix4fv(glGetUniformLocation(mirrorShader.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
 
+		// Reflected Scene
+		glStencilFunc(GL_EQUAL, 1, 0xff);
+		glStencilMask(0x00);
+		glDepthMask(GL_TRUE); // Write to depth buffer
+
+		shaderInMirror.Use();
+
+		glm::mat4 reflectMatrix = glm::mat4(1.0f);
+		reflectMatrix = glm::scale(reflectMatrix, glm::vec3(1, 1, -1)); //  ÒÔxyÆ½Ãæ×÷Îª¾µ×Ó£¬Ïàµ±ÓÚzÖá±äÎª-1£¬ÆäËü²»±ä¡£
+		view = view * reflectMatrix;
+
+		glUniformMatrix4fv(glGetUniformLocation(shaderInMirror.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		
+		glUniformMatrix4fv(glGetUniformLocation(shaderInMirror.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(shaderInMirror.m_shaderProgram, "perspective"), 1, GL_FALSE, glm::value_ptr(perspective));
+		RenderScene(shaderInMirror, false);
+		
+		glDisable(GL_STENCIL_TEST);
+		glStencilMask(0xff);  // glStenciMask会影响glClear(GL_STENCIL_BUFFER_BIT)的结果
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
@@ -307,7 +328,7 @@ int main()
 }
 
 
-void RenderScene(Shader &shader)
+void RenderScene(Shader &shader, bool isFloor=true)
 {
 	boxTexture->Bind(GL_TEXTURE0);
 	glm::mat4 model = glm::mat4(1.0f);
@@ -324,6 +345,9 @@ void RenderScene(Shader &shader)
 	glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
+
+	if(!isFloor)
+		return;
 
 	glBindVertexArray(floorVAO);
 

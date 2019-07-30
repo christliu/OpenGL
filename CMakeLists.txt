@@ -25,6 +25,7 @@ set(Projects
 	11.1.ShadowMap
 	11.2.ShadowMapScene
 	12.Mirror
+	12.2.MirrorOfStencil
 )
 
 foreach(Proj ${Projects})
