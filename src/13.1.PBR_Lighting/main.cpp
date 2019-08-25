@@ -77,6 +77,19 @@ int main()
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
 
+    glm::vec3 lightPositions[] = {
+        glm::vec3(-10.0f,  10.0f, 10.0f),
+        glm::vec3( 10.0f,  10.0f, 10.0f),
+        glm::vec3(-10.0f, -10.0f, 10.0f),
+        glm::vec3( 10.0f, -10.0f, 10.0f),
+    };
+    glm::vec3 lightColors[] = {
+        glm::vec3(300.0f, 300.0f, 300.0f),
+        glm::vec3(300.0f, 300.0f, 300.0f),
+        glm::vec3(300.0f, 300.0f, 300.0f),
+        glm::vec3(300.0f, 300.0f, 300.0f)
+    };
+
 	std::vector<GLfloat> sphereVertices;
 	std::vector<GLuint> sphereIndices;
 	CreateSphere(sphereVertices, sphereIndices);
@@ -135,6 +148,23 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(perspective));
 		glUniformMatrix4fv(glGetUniformLocation(shader.m_shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "CamPos"), camera.Position.x, camera.Position.y, camera.Position.z);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightPositions[0]"), lightPositions[0].x, lightPositions[0].y, lightPositions[0].z);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightPositions[1]"), lightPositions[1].x, lightPositions[1].y, lightPositions[1].z);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightPositions[2]"), lightPositions[2].x, lightPositions[2].y, lightPositions[2].z);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightPositions[3]"), lightPositions[3].x, lightPositions[3].y, lightPositions[3].z);
+		
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightColors[0]"), lightColors[0].x, lightColors[0].y, lightColors[0].z);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightColors[1]"), lightColors[1].x, lightColors[1].y, lightColors[1].z);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightColors[2]"), lightColors[2].x, lightColors[2].y, lightColors[2].z);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "lightColors[3]"), lightColors[3].x, lightColors[3].y, lightColors[3].z);
+
+		glUniform1f(glGetUniformLocation(shader.m_shaderProgram, "roughness"), 0.5);
+		glUniform1f(glGetUniformLocation(shader.m_shaderProgram, "ao"), 1.0);
+		glUniform1f(glGetUniformLocation(shader.m_shaderProgram, "metallic"), 0.5);
+		glUniform3f(glGetUniformLocation(shader.m_shaderProgram, "albedo"), 0.5f, 0.0f, 0.0f);
+
 		glBindVertexArray(sphereVAO);
 		glDrawElements(GL_TRIANGLE_STRIP, sphereIndices.size(), GL_UNSIGNED_INT, 0);
 

@@ -1,9 +1,90 @@
 #version 330 core
 
 in vec2 TexCoords;
-out vec4 color;
+in vec3 WorldPos;
+in vec3 Normal;
+out vec4 FragColor;
+
+uniform vec3 lightPositions[4];
+uniform vec3 lightColors[4];
+uniform vec3 CamPos;
+uniform vec3 albedo;
+
+uniform float roughness;
+uniform float ao;
+uniform float metallic;
+
+const float PI = 3.14159265359;
+
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+	float a = roughness * roughness;
+	float a2 = a * a;
+
+	float NdotH = max(dot(N, H), 0.0);
+	float NdotH2 = NdotH * NdotH;
+
+	float Dom = NdotH2 * (a2 - 1) + 1;
+	Dom = max(Dom * Dom * PI, 0.001);
+
+	return a2 / Dom;
+}
+
+float SchlickGGX(vec3 N, vec3 V, float roughness)
+{
+	// (n . v) / [( n . v)(1 - k) + k]
+	float k = (roughness + 1) * (roughness + 1) / 8.0;
+	float NdotV = max(dot(N, V), 0.0);
+	float Dom = NdotV * (1.0 - k) + k;
+	float Nom = NdotV;
+	return Nom / Dom;
+}
+
+float GemoetrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+	return SchlickGGX(N, V, roughness) * SchlickGGX(N, L, roughness);
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+	return F0 + (1 - F0) * pow(1 - cosTheta, 5.0);
+}
 
 void main()
 {
-    color = vec4(1, 0, 0, 1);
+	vec3 N = normalize(Normal);
+	vec3 V = normalize(CamPos - WorldPos);
+
+	vec3 F0 = vec3(0.04);
+	F0 = mix(F0, albedo, metallic);
+
+	vec3 Lo = vec3(0);
+	for(int i = 0; i < 4; ++i) 
+	{
+		vec3 L = normalize(lightPositions[i] - WorldPos);
+		vec3 H = normalize(V + L);
+
+		float distance = length(lightPositions[i] - WorldPos);
+		vec3 radiance = lightColors[i] * (1.0 / (distance * distance));
+		// BRDF
+		float NDF = DistributionGGX(N, H, roughness);
+		vec3 F = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
+		float G = GemoetrySmith(N, V, L, roughness);
+
+		vec3 nom = NDF * F * G;
+
+		float dom = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
+		vec3 specular = nom / max(dom, 0.001);
+
+		vec3 kS = F;
+		vec3 kD = vec3(1.0) - kS;
+		kD *= (1.0 - metallic);
+		float NdotL = max(dot(N, L), 0.0);
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+	}
+
+	vec3 color = Lo + vec3(0.03) * albedo * ao;
+	color = color / (color + vec3(1.0));
+	color = pow(color, vec3(1.0/2.2));
+    FragColor = vec4(color, 1);
 }
